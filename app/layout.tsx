@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html lang="fa" dir="rtl">
       <body>
         <StoreProvider>
           <ThemeProvider>{children}</ThemeProvider>

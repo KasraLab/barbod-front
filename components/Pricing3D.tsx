@@ -1,75 +1,153 @@
-'use client';
+ 'use client';
 
 import { Check, Zap, Rocket, Building2 } from 'lucide-react';
 import { Button } from './Button';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useLanguage } from '../lib/language-context';
+import type { Language } from '../lib/translations';
 
-const plans = [
+type Plan = {
+  icon: typeof Zap;
+  highlighted?: boolean;
+  color: string;
+  gradient: string;
+  copy: Record<Language, { name: string; price: string; period?: string; description: string; features: string[]; cta: string }>;
+};
+
+const plans: Plan[] = [
   {
-    name: 'استارتاپ',
     icon: Zap,
-    price: 'رایگان',
-    description: 'برای شروع و تست',
-    features: [
-      '۱,۰۰۰ احراز هویت در ماه',
-      'تشخیص چهره پایه',
-      'OCR ساده',
-      'پشتیبانی ایمیل',
-      'API Documentation',
-      'نگهداری داده ۳۰ روز'
-    ],
     highlighted: false,
     color: 'var(--brand-teal)',
-    gradient: 'from-[#14B8A6] to-[#06B6D4]'
+    gradient: 'from-[#14B8A6] to-[#06B6D4]',
+    copy: {
+      en: {
+        name: 'Launch',
+        price: '$0',
+        period: '/month',
+        description: 'Perfect for pilots, hackathons, and internal demos.',
+        features: ['1,000 verifications', 'Face match starter', 'Basic OCR', 'Email support', 'API docs', '30-day retention'],
+        cta: 'Start free',
+      },
+      fa: {
+        name: 'استارتاپ',
+        price: 'رایگان',
+        period: '/ماه',
+        description: 'برای شروع و تست',
+        features: ['۱,۰۰۰ احراز هویت در ماه', 'تشخیص چهره پایه', 'OCR ساده', 'پشتیبانی ایمیل', 'API Documentation', 'نگهداری داده ۳۰ روز'],
+        cta: 'شروع کنید',
+      },
+    },
   },
   {
-    name: 'حرفه‌ای',
     icon: Rocket,
-    price: '۲,۴۹۰,۰۰۰',
-    period: '/ماه',
-    description: 'برای کسب‌وکارهای رو به رشد',
-    features: [
-      '۱۰,۰۰۰ احراز هویت در ماه',
-      'تشخیص چهره پیشرفته',
-      'تست زنده‌بودن',
-      'OCR هوشمند',
-      'پشتیبانی اولویت‌دار',
-      'Webhook & Callback',
-      'نگهداری داده ۹۰ روز',
-      'گزارش‌های تفصیلی'
-    ],
     highlighted: true,
     color: 'var(--brand-azure)',
-    gradient: 'from-[#3B82F6] to-[#6366F1]'
+    gradient: 'from-[#3B82F6] to-[#6366F1]',
+    copy: {
+      en: {
+        name: 'Scale',
+        price: '$249',
+        period: '/month',
+        description: 'Add liveness, automation, and premium support.',
+        features: [
+          '10,000 verifications',
+          'Advanced liveness suite',
+          'Smart OCR',
+          'Priority support',
+          'Webhook + Callback',
+          '90-day retention',
+          'Detailed analytics',
+          'Custom branding',
+        ],
+        cta: 'Choose Scale',
+      },
+      fa: {
+        name: 'حرفه‌ای',
+        price: '۲,۴۹۰,۰۰۰',
+        period: '/ماه',
+        description: 'برای کسب‌وکارهای رو به رشد',
+        features: [
+          '۱۰,۰۰۰ احراز هویت در ماه',
+          'تشخیص چهره پیشرفته',
+          'تست زنده‌بودن',
+          'OCR هوشمند',
+          'پشتیبانی اولویت‌دار',
+          'Webhook & Callback',
+          'نگهداری داده ۹۰ روز',
+          'گزارش‌های تفصیلی',
+        ],
+        cta: 'انتخاب پلن حرفه‌ای',
+      },
+    },
   },
   {
-    name: 'سازمانی',
     icon: Building2,
-    price: 'سفارشی',
-    description: 'برای سازمان‌های بزرگ',
-    features: [
-      'احراز هویت نامحدود',
-      'تمامی قابلیت‌های حرفه‌ای',
-      'تشخیص صوت',
-      'امضای دیجیتال',
-      'پشتیبانی ۲۴/۷',
-      'مدیر حساب اختصاصی',
-      'SLA تضمین شده',
-      'On-Premise Deployment',
-      'سفارشی‌سازی کامل'
-    ],
     highlighted: false,
     color: 'var(--brand-indigo)',
-    gradient: 'from-[#6366F1] to-[#8B5CF6]'
-  }
+    gradient: 'from-[#6366F1] to-[#8B5CF6]',
+    copy: {
+      en: {
+        name: 'Enterprise',
+        price: 'Custom',
+        description: 'For banks, telcos, and government workloads.',
+        features: [
+          'Unlimited verifications',
+          'Voice + signature verification',
+          'Dedicated TAM',
+          '24/7 support',
+          'Custom SLAs',
+          'On-premise / private cloud',
+          'Advanced reporting',
+          'Full white-label',
+          'Bespoke compliance reviews',
+        ],
+        cta: 'Contact sales',
+      },
+      fa: {
+        name: 'سازمانی',
+        price: 'سفارشی',
+        description: 'برای سازمان‌های بزرگ',
+        features: [
+          'احراز هویت نامحدود',
+          'تمامی قابلیت‌های حرفه‌ای',
+          'تشخیص صوت',
+          'امضای دیجیتال',
+          'پشتیبانی ۲۴/۷',
+          'مدیر حساب اختصاصی',
+          'SLA تضمین شده',
+          'On-Premise Deployment',
+          'سفارشی‌سازی کامل',
+        ],
+        cta: 'ارتباط با فروش',
+      },
+    },
+  },
 ];
+
+const headerCopy: Record<Language, { badge: string; title: string; highlight: string; description: string }> = {
+  en: {
+    badge: '3D pricing',
+    title: 'Pick the plan that',
+    highlight: 'matches your growth',
+    description: 'Start for free, scale automatically, and request enterprise pricing when you are ready.',
+  },
+  fa: {
+    badge: 'قیمت‌گذاری',
+    title: 'پلن مناسب',
+    highlight: 'خود را انتخاب کنید',
+    description: 'شروع رایگان - بدون نیاز به کارت اعتباری',
+  },
+};
 
 export function Pricing3D() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const { language, dir } = useLanguage();
+  const copy = headerCopy[language];
 
   return (
-    <section className="py-20 lg:py-32 relative overflow-hidden" id="pricing">
+    <section className="py-20 lg:py-32 relative overflow-hidden" id="pricing" dir={dir}>
       {/* Background Elements */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[color:var(--brand-cyan)] rounded-full blur-[150px]"></div>
@@ -85,7 +163,7 @@ export function Pricing3D() {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[color:var(--surface-card)] border border-[color:var(--border-subtle)] mb-6"
           >
-            <span className="text-sm text-[color:var(--brand-azure)]">قیمت‌گذاری</span>
+            <span className="text-sm text-[color:var(--brand-azure)]">{copy.badge}</span>
           </motion.div>
 
           <motion.h2
@@ -95,7 +173,7 @@ export function Pricing3D() {
             transition={{ delay: 0.1 }}
             className="text-3xl sm:text-4xl lg:text-5xl mb-6"
           >
-            پلن مناسب <span className="text-brand-gradient">خود را انتخاب کنید</span>
+            {copy.title} <span className="text-brand-gradient">{copy.highlight}</span>
           </motion.h2>
 
           <motion.p
@@ -105,15 +183,17 @@ export function Pricing3D() {
             transition={{ delay: 0.2 }}
             className="text-lg text-[color:var(--text-secondary)]"
           >
-            شروع رایگان - بدون نیاز به کارت اعتباری
+            {copy.description}
           </motion.p>
         </div>
 
         {/* Pricing Cards */}
         <div className="grid lg:grid-cols-3 gap-8 perspective-2000">
-          {plans.map((plan, index) => (
+          {plans.map((plan, index) => {
+            const localizedPlan = plan.copy[language];
+            return (
             <motion.div
-              key={plan.name}
+              key={`${localizedPlan.name}-${index}`}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -184,22 +264,22 @@ export function Pricing3D() {
                   </div>
 
                   {/* Plan Name */}
-                  <h3 className="text-2xl mb-2">{plan.name}</h3>
-                  <p className="text-sm text-[color:var(--text-secondary)] mb-6">{plan.description}</p>
+                  <h3 className="text-2xl mb-2">{localizedPlan.name}</h3>
+                  <p className="text-sm text-[color:var(--text-secondary)] mb-6">{localizedPlan.description}</p>
 
                   {/* Price */}
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-4xl text-brand-gradient">{plan.price}</span>
-                      {plan.period && (
-                        <span className="text-[color:var(--text-secondary)]">{plan.period}</span>
+                      <span className="text-4xl text-brand-gradient">{localizedPlan.price}</span>
+                      {localizedPlan.period && (
+                        <span className="text-[color:var(--text-secondary)]">{localizedPlan.period}</span>
                       )}
                     </div>
                   </div>
 
                   {/* Features */}
                   <ul className="space-y-4 mb-8">
-                    {plan.features.map((feature, featureIndex) => (
+                    {localizedPlan.features.map((feature, featureIndex) => (
                       <motion.li
                         key={featureIndex}
                         initial={{ opacity: 0, x: -20 }}
@@ -225,12 +305,12 @@ export function Pricing3D() {
                     size="lg"
                     className={plan.highlighted ? 'shadow-[var(--shadow-lg)]' : ''}
                   >
-                    {plan.price === 'سفارشی' ? 'تماس با فروش' : 'شروع کنید'}
+                    {localizedPlan.cta}
                   </Button>
                 </div>
               </motion.div>
             </motion.div>
-          ))}
+          )})}
         </div>
 
         {/* Bottom Note */}

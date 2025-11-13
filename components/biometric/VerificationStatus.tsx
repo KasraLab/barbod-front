@@ -1,4 +1,7 @@
-import { CheckCircle2, Circle, Clock, XCircle } from 'lucide-react';
+'use client';
+
+import { CheckCircle2, Circle, Clock, XCircle, AlertTriangle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 type StepStatus = 'completed' | 'current' | 'pending' | 'failed';
@@ -9,192 +12,190 @@ interface Step {
   status: StepStatus;
   score?: number;
   timestamp?: string;
+  note?: string;
 }
 
-const steps: Step[] = [
-  { id: 'consent', label: 'موافقتنامه', status: 'completed', timestamp: '14:23:15' },
-  { id: 'liveness', label: 'تست زنده‌بودن', status: 'completed', score: 96, timestamp: '14:23:42' },
-  { id: 'selfie', label: 'ثبت سلفی', status: 'completed', score: 98, timestamp: '14:24:08' },
-  { id: 'face-match', label: 'تطابق چهره', status: 'completed', score: 94, timestamp: '14:24:15' },
-  { id: 'ocr', label: 'OCR مدرک', status: 'completed', score: 97, timestamp: '14:24:38' },
-  { id: 'voice', label: 'احراز صوتی', status: 'current', score: 93 }
+const STEPS: Step[] = [
+  { id: 'consent', label: 'Consent captured', status: 'completed', timestamp: '14:23:15' },
+  { id: 'liveness', label: 'Liveness challenge', status: 'completed', score: 96, timestamp: '14:23:42' },
+  { id: 'selfie', label: 'Selfie capture', status: 'completed', score: 98, timestamp: '14:24:08' },
+  { id: 'face-match', label: 'Face match vs. ID', status: 'completed', score: 94, timestamp: '14:24:15' },
+  { id: 'ocr', label: 'Document OCR', status: 'completed', score: 97, timestamp: '14:24:38' },
+  {
+    id: 'voice',
+    label: 'Voice verification',
+    status: 'current',
+    score: 93,
+    note: 'Awaiting analyst confirmation',
+  },
 ];
 
-export function VerificationStatus() {
-  const completedSteps = steps.filter(s => s.status === 'completed').length;
-  const totalSteps = steps.length;
-  const overallProgress = (completedSteps / totalSteps) * 100;
-  
-  const averageScore = steps
-    .filter(s => s.score !== undefined)
-    .reduce((acc, s) => acc + (s.score || 0), 0) / steps.filter(s => s.score !== undefined).length;
+const RISK_ALERTS = [
+  {
+    id: 'doc',
+    title: 'Document authenticity',
+    status: 'Cleared',
+    description: 'No trace of tampering, glare, or mismatch with template registry.',
+  },
+  {
+    id: 'device',
+    title: 'Device integrity',
+    status: 'Low risk',
+    description: 'Hardware, location, and IP reputation are aligned with the customer profile.',
+  },
+  {
+    id: 'velocity',
+    title: 'Velocity',
+    status: 'Cleared',
+    description: 'No duplicate submissions detected in the past 30 days.',
+  },
+];
 
-  const getStatusIcon = (status: StepStatus) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle2 className="w-5 h-5 text-[color:var(--success)]" />;
-      case 'current':
-        return <Clock className="w-5 h-5 text-[color:var(--brand-azure)]" />;
-      case 'failed':
-        return <XCircle className="w-5 h-5 text-[color:var(--danger)]" />;
-      default:
-        return <Circle className="w-5 h-5 text-[color:var(--text-tertiary)]" />;
-    }
-  };
+const metricCards = [
+  { label: 'Verification ID', value: '#KYC-4095' },
+  { label: 'Processing time', value: '01:32' },
+  { label: 'Analyst SLA', value: '< 5 min' },
+];
+
+const statusIconMap: Record<StepStatus, LucideIcon> = {
+  completed: CheckCircle2,
+  current: Clock,
+  pending: Circle,
+  failed: XCircle,
+};
+
+export function VerificationStatus() {
+  const completedSteps = STEPS.filter((step) => step.status === 'completed').length;
+  const totalSteps = STEPS.length;
+  const overallProgress = (completedSteps / totalSteps) * 100;
+
+  const scoredSteps = STEPS.filter((step) => typeof step.score === 'number');
+  const averageScore = scoredSteps.length
+    ? scoredSteps.reduce((sum, step) => sum + (step.score ?? 0), 0) / scoredSteps.length
+    : null;
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-[color:var(--surface-elevated)] rounded-[var(--radius-lg)] border border-[color:var(--border-hairline)] p-6">
-        {/* Header */}
         <div className="mb-6">
-          <h3 className="text-xl mb-2">وضعیت احراز هویت</h3>
+          <h3 className="text-xl mb-2">Verification status</h3>
           <p className="text-[color:var(--text-secondary)]">
-            پیشرفت فرآیند احراز هویت بیومتریک
+            Monitor every biometric step, review the aggregated risk signals, and decide whether to approve or escalate.
           </p>
         </div>
 
-        {/* Overall Progress */}
         <div className="mb-8 p-6 rounded-[var(--radius-lg)] bg-[color:var(--surface-card)]">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
-              <h4 className="mb-1">پیشرفت کلی</h4>
+              <h4 className="mb-1">Overall progress</h4>
               <p className="text-sm text-[color:var(--text-secondary)]">
-                {completedSteps} از {totalSteps} مرحله تکمیل شده
+                {completedSteps} of {totalSteps} checks completed
               </p>
             </div>
-            <div className="text-left">
-              <div className="text-2xl text-brand-gradient mb-1">{Math.round(averageScore)}٪</div>
-              <div className="text-xs text-[color:var(--text-secondary)]">میانگین امتیاز</div>
-            </div>
+            {averageScore && (
+              <div className="text-right">
+                <div className="text-3xl font-semibold text-brand-gradient">{Math.round(averageScore)}%</div>
+                <p className="text-xs text-[color:var(--text-secondary)]">Average biometric confidence</p>
+              </div>
+            )}
           </div>
           <div className="h-3 bg-[color:var(--bg-dim)] rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${overallProgress}%` }}
-              transition={{ duration: 1 }}
+              transition={{ duration: 0.8 }}
               className="h-full bg-brand-gradient rounded-full"
-            ></motion.div>
+            />
           </div>
         </div>
 
-        {/* Steps Timeline */}
-        <div className="space-y-4 mb-6">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`
-                relative pr-12 pb-4
-                ${index !== steps.length - 1 ? 'border-r-2' : ''}
-                ${step.status === 'completed' ? 'border-[color:var(--success)]' : 
-                  step.status === 'current' ? 'border-[color:var(--brand-azure)]' :
-                  'border-[color:var(--border-hairline)]'}
-              `}
-            >
-              {/* Icon */}
-              <div className="absolute right-0 top-0 -mr-[13px]">
-                <div className={`
-                  w-6 h-6 rounded-full flex items-center justify-center
-                  ${step.status === 'completed' ? 'bg-[color:var(--success)] bg-opacity-20' :
-                    step.status === 'current' ? 'bg-[color:var(--brand-azure)] bg-opacity-20' :
-                    'bg-[color:var(--surface-card)]'}
-                `}>
-                  {getStatusIcon(step.status)}
-                </div>
-              </div>
+        <div className="space-y-4 mb-8">
+          {STEPS.map((step, index) => {
+            const StatusIcon = statusIconMap[step.status];
+            const accentClasses =
+              step.status === 'completed'
+                ? 'bg-[color:var(--success)] bg-opacity-10 border-[color:var(--success)]'
+                : step.status === 'current'
+                ? 'bg-[color:var(--brand-azure)] bg-opacity-10 border-[color:var(--brand-azure)]'
+                : step.status === 'failed'
+                ? 'bg-[color:var(--danger)] bg-opacity-10 border-[color:var(--danger)]'
+                : 'bg-[color:var(--surface-card)] border-[color:var(--border-hairline)]';
 
-              {/* Content */}
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h4 className={
-                      step.status === 'completed' ? 'text-[color:var(--text-primary)]' :
-                      step.status === 'current' ? 'text-[color:var(--brand-azure)]' :
-                      'text-[color:var(--text-tertiary)]'
-                    }>
-                      {step.label}
-                    </h4>
-                    {step.status === 'completed' && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-[color:var(--success)] bg-opacity-10 text-[color:var(--success)]">
-                        تکمیل شده
-                      </span>
-                    )}
-                    {step.status === 'current' && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-[color:var(--brand-azure)] bg-opacity-10 text-[color:var(--brand-azure)]">
-                        در حال انجام
-                      </span>
-                    )}
-                  </div>
-                  
-                  {step.timestamp && (
-                    <p className="text-xs text-[color:var(--text-tertiary)] mb-2" dir="ltr" style={{ textAlign: 'right' }}>
-                      {step.timestamp}
-                    </p>
-                  )}
-
-                  {step.score !== undefined && (
-                    <div className="max-w-xs">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-[color:var(--text-secondary)]">امتیاز اطمینان</span>
-                        <span className={`text-xs ${
-                          step.score >= 95 ? 'text-[color:var(--success)]' :
-                          step.score >= 85 ? 'text-[color:var(--brand-azure)]' :
-                          'text-[color:var(--warning)]'
-                        }`}>
-                          {step.score}٪
-                        </span>
-                      </div>
-                      <div className="h-1.5 bg-[color:var(--bg-dim)] rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${step.score}%` }}
-                          transition={{ duration: 0.8, delay: index * 0.1 + 0.3 }}
-                          className={`h-full rounded-full ${
-                            step.score >= 95 ? 'bg-gradient-to-r from-[color:var(--brand-cyan)] to-[color:var(--success)]' :
-                            step.score >= 85 ? 'bg-brand-gradient' :
-                            'bg-gradient-to-r from-[color:var(--warning)] to-[color:var(--brand-azure)]'
-                          }`}
-                        ></motion.div>
-                      </div>
+            return (
+              <motion.div
+                key={step.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`p-4 rounded-[var(--radius-lg)] border ${accentClasses}`}
+              >
+                <div className="flex flex-wrap gap-4 items-center">
+                  <div className="flex items-center gap-3 flex-1 min-w-[200px]">
+                    <div
+                      className={`
+                        w-12 h-12 rounded-full flex items-center justify-center border
+                        ${
+                          step.status === 'completed'
+                            ? 'border-[color:var(--success)] text-[color:var(--success)]'
+                            : step.status === 'current'
+                            ? 'border-[color:var(--brand-azure)] text-[color:var(--brand-azure)]'
+                            : step.status === 'failed'
+                            ? 'border-[color:var(--danger)] text-[color:var(--danger)]'
+                            : 'border-[color:var(--border-subtle)] text-[color:var(--text-tertiary)]'
+                        }
+                      `}
+                    >
+                      <StatusIcon className="w-5 h-5" />
                     </div>
-                  )}
+                    <div>
+                      <p className="font-medium">{step.label}</p>
+                      <p className="text-xs text-[color:var(--text-secondary)]">
+                        {step.timestamp ? `Completed at ${step.timestamp}` : step.note ?? 'Pending execution'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-[color:var(--text-secondary)]">
+                    <span className="text-xs uppercase tracking-wide text-[color:var(--text-tertiary)]">Score</span>
+                    <span className="text-base font-semibold">
+                      {typeof step.score === 'number' ? `${step.score}%` : step.status === 'completed' ? 'N/A' : '--'}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
+          {metricCards.map((metric) => (
+            <div
+              key={metric.label}
+              className="p-4 rounded-[var(--radius-md)] bg-[color:var(--surface-card)] border border-[color:var(--border-hairline)]"
+            >
+              <p className="text-xs text-[color:var(--text-tertiary)] mb-1">{metric.label}</p>
+              <p className="text-xl font-semibold text-[color:var(--text-primary)]">{metric.value}</p>
+            </div>
           ))}
         </div>
 
-        {/* Final Verdict */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="p-6 rounded-[var(--radius-lg)] bg-[color:var(--success)] bg-opacity-10 border-2 border-[color:var(--success)]"
-        >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-[color:var(--success)] bg-opacity-20 flex items-center justify-center flex-shrink-0">
-              <CheckCircle2 className="w-6 h-6 text-[color:var(--success)]" />
-            </div>
-            <div className="flex-1">
-              <h4 className="text-lg mb-2">احراز هویت موفق</h4>
-              <p className="text-sm text-[color:var(--text-secondary)] mb-4">
-                هویت شما با موفقیت تأیید شد. تمامی مراحل احراز هویت بیومتریک با امتیاز بالا تکمیل شده است.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <div className="px-3 py-1.5 rounded bg-[color:var(--surface-card)] text-xs">
-                  <span className="text-[color:var(--text-secondary)]">شناسه تراکنش: </span>
-                  <code className="text-[color:var(--brand-azure)]" dir="ltr">TXN-2024-A7B3C9</code>
+        <div className="space-y-3">
+          <h4 className="text-sm uppercase tracking-wide text-[color:var(--text-tertiary)]">Risk summary</h4>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {RISK_ALERTS.map((alert) => (
+              <div
+                key={alert.id}
+                className="p-4 rounded-[var(--radius-md)] bg-[color:var(--bg-base)] border border-[color:var(--border-hairline)]"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-4 h-4 text-[color:var(--brand-azure)]" />
+                  <p className="font-medium">{alert.title}</p>
                 </div>
-                <div className="px-3 py-1.5 rounded bg-[color:var(--surface-card)] text-xs">
-                  <span className="text-[color:var(--text-secondary)]">زمان: </span>
-                  <span dir="ltr">2024-10-30 14:24:45</span>
-                </div>
+                <p className="text-xs text-[color:var(--text-tertiary)] mb-1">{alert.status}</p>
+                <p className="text-sm text-[color:var(--text-secondary)]">{alert.description}</p>
               </div>
-            </div>
+            ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

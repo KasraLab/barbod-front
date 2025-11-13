@@ -9,15 +9,46 @@ import { Logo } from './Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RootState } from '../lib/store/store';
 import { setTheme } from '../lib/store/themeSlice';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useLanguage } from '../lib/language-context';
+import type { Language } from '../lib/translations';
 
 interface NavbarProps {
   onNavigate: (section: string) => void;
 }
 
+const navCopy: Record<
+  Language,
+  {
+    search: string;
+    demo: string;
+    login: string;
+    signup: string;
+    themeToggle: string;
+  }
+> = {
+  en: {
+    search: 'Search',
+    demo: 'View demo',
+    login: 'Log in',
+    signup: 'Sign up',
+    themeToggle: 'Toggle theme',
+  },
+  fa: {
+    search: 'جستجو',
+    demo: 'مشاهده دمو',
+    login: 'ورود',
+    signup: 'ثبت‌نام',
+    themeToggle: 'تغییر تم',
+  },
+};
+
 export function Navbar({ onNavigate }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const theme = useSelector((state: RootState) => state.theme.theme);
+  const { language } = useLanguage();
+  const copy = navCopy[language] ?? navCopy.en;
 
   const navItems = [
     { label: 'راه‌حل‌ها', href: 'solutions' },
@@ -67,10 +98,11 @@ export function Navbar({ onNavigate }: NavbarProps) {
 
             {/* Right Actions */}
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               {/* Search - desktop only */}
               <button className="hidden md:flex items-center gap-2 px-3 h-9 rounded-[var(--radius-md)] bg-[color:var(--surface-card)] text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] transition-colors">
                 <Search className="w-4 h-4" />
-                <span className="text-sm">جستجو</span>
+                <span className="text-sm">{copy.search}</span>
                 <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-xs bg-[color:var(--bg-dim)] rounded border border-[color:var(--border-hairline)]">
                   ⌘K
                 </kbd>
@@ -80,15 +112,25 @@ export function Navbar({ onNavigate }: NavbarProps) {
               <button
                 onClick={handleThemeToggle}
                 className="w-9 h-9 rounded-[var(--radius-md)] bg-[color:var(--surface-card)] flex items-center justify-center hover:bg-[color:var(--surface-elevated)] transition-colors"
-                aria-label="تغییر تم"
+                aria-label={copy.themeToggle}
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
 
-              {/* CTA Button - desktop only */}
-              <div className="hidden md:block">
+              {/* Demo + Auth Buttons - desktop only */}
+              <div className="hidden md:flex items-center gap-2">
                 <Link href="/verification">
-                  <Button size="sm">شروع کنید</Button>
+                  <Button variant="tertiary" size="sm">
+                    {copy.demo}
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    {copy.login}
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm">{copy.signup}</Button>
                 </Link>
               </div>
 
@@ -114,6 +156,9 @@ export function Navbar({ onNavigate }: NavbarProps) {
             className="md:hidden border-t border-[color:var(--border-hairline)] bg-[color:var(--surface-elevated)]"
           >
             <div className="px-4 py-4 space-y-3">
+              <div className="flex justify-end">
+                <LanguageSwitcher />
+              </div>
               {navItems.map((item) => (
                 <button
                   key={item.label}
@@ -123,9 +168,23 @@ export function Navbar({ onNavigate }: NavbarProps) {
                   {item.label}
                 </button>
               ))}
-              <Link href="/verification">
-                <Button fullWidth size="md">شروع کنید</Button>
-              </Link>
+              <div className="grid gap-2 pt-2">
+                <Link href="/verification">
+                  <Button fullWidth size="md" variant="tertiary">
+                    {copy.demo}
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button fullWidth size="md" variant="ghost">
+                    {copy.login}
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button fullWidth size="md">
+                    {copy.signup}
+                  </Button>
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}
@@ -133,3 +192,5 @@ export function Navbar({ onNavigate }: NavbarProps) {
     </motion.nav>
   );
 }
+
+

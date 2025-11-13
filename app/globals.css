@@ -49,6 +49,16 @@
     --spacing-3xl: 40px;
     --spacing-4xl: 56px;
     --spacing-5xl: 72px;
+
+    --direction: ltr;
+    --font-body: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-heading: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  :root[lang="fa"] {
+    --direction: rtl;
+    --font-body: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-heading: 'Vazirmatn', sans-serif;
   }
 
   [data-theme="light"] {
@@ -79,17 +89,17 @@
 
   body {
     @apply bg-[color:var(--bg-base)] text-[color:var(--text-primary)];
-    font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    direction: rtl;
+    font-family: var(--font-body);
+    direction: var(--direction);
   }
 
   h1 {
-    font-family: 'Vazirmatn', sans-serif;
+    font-family: var(--font-heading);
     letter-spacing: -0.01em;
   }
 
   h2, h3, h4, h5, h6 {
-    font-family: 'Vazirmatn', sans-serif;
+    font-family: var(--font-heading);
     letter-spacing: -0.01em;
   }
 

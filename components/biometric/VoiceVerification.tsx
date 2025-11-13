@@ -1,28 +1,54 @@
-import { useState } from 'react';
+'use client';
+
+import { useMemo, useState } from 'react';
 import { Mic, Play, RotateCw, CheckCircle } from 'lucide-react';
 import { Button } from '../Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type RecordingState = 'idle' | 'recording' | 'recorded' | 'playing';
 
+const PASS_PHRASE =
+  'Barbod verifies my identity. My voice is my secure signature.';
+const TRANSCRIPTION =
+  'Barbod verifies my identity. My voice is my secure signature.';
+
+const STATUS_COPY: Record<RecordingState, string> = {
+  idle: 'Tap the microphone and read the passphrase at a natural pace.',
+  recording: 'Recording... keep a steady tone until the ring completes.',
+  recorded: 'Voiceprint captured. Review the transcription before submitting.',
+  playing: 'Playing your sample back to check for noise.',
+};
+
 export function VoiceVerification() {
   const [recordingState, setRecordingState] = useState<RecordingState>('idle');
   const [similarityScore, setSimilarityScore] = useState<number | null>(null);
-  
-  const passphrase = "باربُد سیستم احراز هویت بیومتریک شماره ۷۸۴۳";
-  const transcription = "باربُد سیستم احراز هویت بیومتریک شماره ۷۸۴۳";
+
+  const analysis = useMemo(
+    () => [
+      { label: 'Similarity', value: similarityScore ? `${similarityScore.toFixed(1)}%` : '--', emphasis: 'success' },
+      { label: 'Signal-to-noise', value: recordingState === 'idle' ? '--' : '23 dB', emphasis: 'neutral' },
+      { label: 'Duration', value: recordingState === 'recorded' || recordingState === 'playing' ? '6.2 s' : '--', emphasis: 'neutral' },
+    ],
+    [recordingState, similarityScore],
+  );
 
   const handleRecord = () => {
+    if (recordingState === 'recording') {
+      return;
+    }
     setRecordingState('recording');
-    setTimeout(() => {
+    window.setTimeout(() => {
       setRecordingState('recorded');
       setSimilarityScore(94.7);
     }, 3000);
   };
 
   const handlePlay = () => {
+    if (recordingState !== 'recorded') {
+      return;
+    }
     setRecordingState('playing');
-    setTimeout(() => {
+    window.setTimeout(() => {
       setRecordingState('recorded');
     }, 2000);
   };
@@ -35,209 +61,147 @@ export function VoiceVerification() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="bg-[color:var(--surface-elevated)] rounded-[var(--radius-lg)] border border-[color:var(--border-hairline)] p-6">
-        {/* Header */}
         <div className="mb-6">
-          <h3 className="text-xl mb-2">احراز هویت صوتی</h3>
+          <h3 className="text-xl mb-2">Voice verification</h3>
           <p className="text-[color:var(--text-secondary)]">
-            عبارت زیر را با صدای بلند و واضح بخوانید
+            Capture a short passphrase so we can compare the voiceprint to the template enrolled during onboarding.
           </p>
         </div>
 
-        {/* Passphrase Card */}
         <div className="mb-6 p-6 rounded-[var(--radius-lg)] bg-[color:var(--surface-card)] border-2 border-[color:var(--border-subtle)]">
           <div className="flex items-start gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-brand-gradient flex items-center justify-center flex-shrink-0">
               <Mic className="w-5 h-5 text-[color:var(--text-inverse)]" />
             </div>
             <div>
-              <h4 className="mb-2">عبارت تأیید:</h4>
-              <p className="text-lg leading-relaxed">{passphrase}</p>
+              <h4 className="mb-2 text-[color:var(--text-primary)]">Passphrase</h4>
+              <p className="text-lg leading-relaxed">{PASS_PHRASE}</p>
             </div>
           </div>
           <div className="text-xs text-[color:var(--text-tertiary)] bg-[color:var(--bg-dim)] rounded px-3 py-2">
-            💡 عبارت به صورت تصادفی تولید شده و در هر بار متفاوت است
+            Use a conversational tone. Speaking too fast or too soft can reduce the similarity score.
           </div>
         </div>
 
-        {/* Recording Interface */}
         <div className="mb-6">
           <div className="relative aspect-[2/1] bg-[color:var(--bg-dim)] rounded-[var(--radius-lg)] overflow-hidden p-8">
-            <div className="h-full flex flex-col items-center justify-center gap-4">
-              {/* Mic button */}
+            <div className="h-full flex flex-col items-center justify-center gap-6">
               <motion.button
-                onClick={recordingState === 'idle' ? handleRecord : undefined}
-                disabled={recordingState !== 'idle' && recordingState !== 'recorded'}
-                whileHover={{ scale: recordingState === 'idle' ? 1.05 : 1 }}
-                whileTap={{ scale: recordingState === 'idle' ? 0.95 : 1 }}
+                type="button"
+                onClick={handleRecord}
+                disabled={recordingState === 'recording'}
+                whileHover={{ scale: recordingState === 'recording' ? 1 : 1.05 }}
+                whileTap={{ scale: recordingState === 'recording' ? 1 : 0.95 }}
                 className={`
                   relative w-24 h-24 rounded-full flex items-center justify-center transition-all
-                  ${recordingState === 'recording' 
-                    ? 'bg-[color:var(--danger)] animate-pulse-slow' 
-                    : 'bg-brand-gradient hover:opacity-90'
-                  }
-                  ${recordingState !== 'idle' && recordingState !== 'recorded' ? 'cursor-not-allowed' : ''}
+                  ${recordingState === 'recording' ? 'bg-[color:var(--danger)] animate-pulse-slow' : 'bg-brand-gradient'}
+                  ${recordingState === 'recording' ? 'cursor-not-allowed' : ''}
                 `}
               >
                 <Mic className="w-10 h-10 text-[color:var(--text-inverse)]" />
-                
                 {recordingState === 'recording' && (
                   <motion.div
-                    initial={{ scale: 1, opacity: 0.5 }}
+                    initial={{ scale: 1, opacity: 0.4 }}
                     animate={{ scale: 2, opacity: 0 }}
                     transition={{ duration: 1.5, repeat: Infinity }}
                     className="absolute inset-0 rounded-full bg-[color:var(--danger)]"
-                  ></motion.div>
+                  />
                 )}
               </motion.button>
 
-              {/* Status text */}
-              <div className="text-center">
-                <p className="text-sm text-[color:var(--text-secondary)]">
-                  {recordingState === 'idle' && 'روی دکمه ضبط کلیک کنید'}
-                  {recordingState === 'recording' && 'در حال ضبط...'}
-                  {recordingState === 'recorded' && 'ضبط کامل شد'}
-                  {recordingState === 'playing' && 'در حال پخش...'}
-                </p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  iconLeading={<Play className="w-4 h-4" />}
+                  onClick={handlePlay}
+                  disabled={recordingState !== 'recorded'}
+                >
+                  Play sample
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  iconLeading={<RotateCw className="w-4 h-4" />}
+                  onClick={handleRetry}
+                  disabled={recordingState === 'recording'}
+                >
+                  Start over
+                </Button>
               </div>
 
-              {/* Waveform visualization */}
-              {recordingState === 'recording' && (
-                <div className="flex items-center gap-1 h-12">
-                  {Array.from({ length: 20 }).map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-1 bg-[color:var(--brand-azure)] rounded-full"
-                      animate={{
-                        height: [8, Math.random() * 40 + 10, 8]
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        repeat: Infinity,
-                        delay: i * 0.05
-                      }}
-                    ></motion.div>
-                  ))}
-                </div>
-              )}
+              <div className="w-full h-20">
+                <svg viewBox="0 0 320 80" className="w-full h-full text-[color:var(--brand-azure)]">
+                  {[...Array(40)].map((_, index) => {
+                    const height = 10 + Math.abs(Math.sin(index)) * 30;
+                    return (
+                      <rect
+                        key={index}
+                        x={index * 8}
+                        width="4"
+                        y={(80 - height) / 2}
+                        height={height}
+                        rx="2"
+                        className="fill-current opacity-60"
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
 
-              {/* VU Meter */}
-              {recordingState === 'recording' && (
-                <div className="w-full max-w-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-[color:var(--text-tertiary)]">سطح صدا</span>
-                    <span className="text-xs text-[color:var(--success)]">عالی</span>
-                  </div>
-                  <div className="h-2 bg-[color:var(--surface-card)] rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-[color:var(--success)] to-[color:var(--brand-azure)] rounded-full"
-                      animate={{ width: ['60%', '85%', '70%'] }}
-                      transition={{ duration: 0.8, repeat: Infinity }}
-                    ></motion.div>
-                  </div>
-                </div>
-              )}
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={recordingState}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="text-sm text-[color:var(--text-secondary)] text-center min-h-[1.5rem]"
+                >
+                  {STATUS_COPY[recordingState]}
+                </motion.p>
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
-        {/* Transcription */}
         {recordingState === 'recorded' && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-[var(--radius-md)] bg-[color:var(--surface-card)] border border-[color:var(--border-hairline)]"
-          >
-            <h4 className="text-sm mb-2 text-[color:var(--text-secondary)]">رونویسی صوت:</h4>
-            <p className="text-sm mb-3">{transcription}</p>
-            
-            {similarityScore !== null && (
-              <div className="pt-3 border-t border-[color:var(--border-hairline)]">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-[color:var(--text-secondary)]">میزان تطابق</span>
-                  <span className={`text-xs ${similarityScore >= 85 ? 'text-[color:var(--success)]' : 'text-[color:var(--warning)]'}`}>
-                    {similarityScore}٪
-                  </span>
-                </div>
-                <div className="h-2 bg-[color:var(--bg-dim)] rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${similarityScore}%` }}
-                    transition={{ duration: 1, delay: 0.3 }}
-                    className={`h-full rounded-full ${
-                      similarityScore >= 85 
-                        ? 'bg-gradient-to-r from-[color:var(--brand-cyan)] to-[color:var(--success)]'
-                        : 'bg-gradient-to-r from-[color:var(--warning)] to-[color:var(--brand-cyan)]'
-                    }`}
-                  ></motion.div>
-                </div>
-                <p className="text-xs text-[color:var(--text-tertiary)] mt-2">
-                  آستانه قبولی: ۸۵٪ {similarityScore >= 85 ? '✓' : '✗'}
-                </p>
-              </div>
-            )}
-          </motion.div>
+          <div className="mb-6 p-4 rounded-[var(--radius-md)] bg-[color:var(--surface-card)] border border-[color:var(--border-hairline)]">
+            <h4 className="mb-2 text-[color:var(--text-primary)]">Transcription</h4>
+            <p className="text-sm text-[color:var(--text-secondary)]">{TRANSCRIPTION}</p>
+          </div>
         )}
 
-        {/* Result */}
-        {similarityScore !== null && similarityScore >= 85 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-[var(--radius-md)] bg-[color:var(--success)] bg-opacity-10 border border-[color:var(--success)]"
-          >
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6 text-[color:var(--success)]" />
-              <div>
-                <h4 className="mb-1">احراز هویت صوتی موفق</h4>
-                <p className="text-sm text-[color:var(--text-secondary)]">
-                  صدای شما با الگوی ذخیره شده مطابقت دارد
-                </p>
-              </div>
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {analysis.map((metric) => (
+            <div
+              key={metric.label}
+              className={`
+                p-4 rounded-[var(--radius-md)] border text-center
+                ${
+                  metric.emphasis === 'success'
+                    ? 'border-[color:var(--success)] text-[color:var(--success)]'
+                    : 'border-[color:var(--border-hairline)] text-[color:var(--text-primary)]'
+                }
+              `}
+            >
+              <p className="text-xs text-[color:var(--text-tertiary)] mb-1">{metric.label}</p>
+              <p className="text-lg font-semibold">{metric.value}</p>
             </div>
-          </motion.div>
-        )}
-
-        {/* Instructions */}
-        <div className="mb-6 p-4 rounded-[var(--radius-md)] bg-[color:var(--surface-card)]">
-          <h4 className="text-sm mb-3">نکات:</h4>
-          <ul className="space-y-2 text-sm text-[color:var(--text-secondary)]">
-            <li>• در محیط آرام و بدون صدای پس‌زمینه باشید</li>
-            <li>• عبارت را با صدای طبیعی و واضح بخوانید</li>
-            <li>• نزدیک میکروفون صحبت کنید ولی خیلی نزدیک نباشید</li>
-          </ul>
+          ))}
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          {recordingState === 'recorded' && (
-            <>
-              <Button
-                variant="ghost"
-                size="lg"
-                iconLeading={<Play className="w-5 h-5" />}
-                onClick={handlePlay}
-              >
-                پخش
-              </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                iconLeading={<RotateCw className="w-5 h-5" />}
-                onClick={handleRetry}
-              >
-                ضبط مجدد
-              </Button>
-            </>
-          )}
-          {similarityScore !== null && similarityScore >= 85 && (
-            <Button
-              fullWidth
-              size="lg"
-              iconLeading={<CheckCircle className="w-5 h-5" />}
-            >
-              تأیید و ادامه
-            </Button>
-          )}
+        <div className="flex flex-col gap-3 md:flex-row">
+          <Button variant="secondary" size="lg" onClick={handleRetry} fullWidth>
+            Retake recording
+          </Button>
+          <Button
+            size="lg"
+            iconLeading={<CheckCircle className="w-5 h-5" />}
+            disabled={recordingState !== 'recorded'}
+            fullWidth
+          >
+            Approve voice match
+          </Button>
         </div>
       </div>
     </div>

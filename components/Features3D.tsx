@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { Scan, Shield, Zap, Lock, Eye, FileCheck } from 'lucide-react';
+import { Scan, Shield, Zap, Lock, Eye, FileCheck, Target, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
@@ -194,31 +194,38 @@ export function Features3D() {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-brand-gradient blur-[100px] animate-pulse-slow"></div>
             </div>
 
-            <div className="relative grid sm:grid-cols-3 gap-8 text-center">
+            <div className="relative grid sm:grid-cols-3 gap-6 text-center">
               {[
-                { value: '۹۹.۹۸٪', label: 'دقت تشخیص', icon: '🎯' },
-                { value: '<۳۰s', label: 'سرعت پردازش', icon: '⚡' },
-                { value: '+۱۰M', label: 'احراز ماهانه', icon: '📊' }
+                { value: '۹۹.۹۸٪', label: 'دقت تشخیص', icon: Target, glow: 'from-[#a5b4fc] to-[#6366f1]' },
+                { value: '<۳۰s', label: 'سرعت پردازش', icon: Zap, glow: 'from-[#67e8f9] to-[#0ea5e9]' },
+                { value: '+۱۰M', label: 'احراز ماهانه', icon: BarChart3, glow: 'from-[#fcd34d] to-[#fb923c]' }
               ].map((stat, index) => (
                 <motion.div
-                  key={index}
+                  key={stat.label}
                   initial={{ opacity: 0, scale: 0.5 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2 }}
-                  whileHover={{ 
-                    scale: 1.1,
-                    rotateY: 10,
-                    z: 30
-                  }}
-                  className="preserve-3d group cursor-pointer"
+                  whileHover={{ scale: 1.08, rotateY: 8, z: 20 }}
+                  className="relative preserve-3d group cursor-pointer rounded-[var(--radius-lg)] border border-[color:var(--border-hairline)] bg-[color:var(--surface-elevated)] px-6 py-8 overflow-hidden"
                 >
-                  <div className="text-4xl mb-3">{stat.icon}</div>
-                  <div 
-                    className="text-3xl lg:text-4xl mb-2 text-brand-gradient"
-                    dangerouslySetInnerHTML={{ __html: stat.value }}
-                  ></div>
-                  <div className="text-sm text-[color:var(--text-secondary)]">{stat.label}</div>
+                  <span
+                    className={`absolute inset-0 bg-gradient-to-br ${stat.glow} opacity-0 group-hover:opacity-15 transition-opacity`}
+                    aria-hidden="true"
+                  />
+                  <div className="relative flex flex-col items-center gap-3">
+                    <div className="relative inline-flex items-center justify-center w-14 h-14">
+                      <span
+                        className={`absolute inset-0 rounded-full bg-gradient-to-br ${stat.glow} opacity-60 blur-xl`}
+                        aria-hidden="true"
+                      />
+                      <span className="absolute inset-0 rounded-full bg-[color:var(--surface-card)]/70 border border-[color:var(--border-subtle)]/60 backdrop-blur flex items-center justify-center">
+                        <stat.icon className="w-6 h-6 text-[color:var(--text-primary)]" />
+                      </span>
+                    </div>
+                    <div className="text-3xl lg:text-4xl text-brand-gradient">{stat.value}</div>
+                    <div className="text-sm text-[color:var(--text-secondary)]">{stat.label}</div>
+                  </div>
                 </motion.div>
               ))}
             </div>

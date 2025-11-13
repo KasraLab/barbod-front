@@ -1,136 +1,139 @@
 'use client';
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from './Button';
-import { useEffect, useState } from 'react';
+import { useLanguage } from '../lib/language-context';
+import type { Language } from '../lib/translations';
+
+type Hero3DCopy = {
+  badge: string;
+  title: string;
+  highlight: string;
+  description: string;
+  primary: string;
+  secondary: string;
+  stats: { value: string; label: string }[];
+};
+
+const hero3dCopy: Record<Language, Hero3DCopy> = {
+  en: {
+    badge: 'Real-time orchestration',
+    title: 'Bring immersive',
+    highlight: 'biometric journeys to life',
+    description:
+      'Stack face match, document capture, voice print, and risk automations inside a single 3D experience. Every module responds to your theme, RTL direction, and compliance profile instantly.',
+    primary: 'Launch sandbox',
+    secondary: 'See platform tour',
+    stats: [
+      { value: '120M+', label: 'Monthly API events' },
+      { value: '45+', label: 'Countries supported' },
+      { value: '24/7', label: 'Ops & monitoring' },
+    ],
+  },
+  fa: {
+    badge: 'هماهنگی لحظه‌ای',
+    title: 'تجربه‌ای غوطه‌ور بسازید',
+    highlight: 'برای سفرهای بیومتریک',
+    description:
+      'تشخیص چهره، ثبت اسناد، اثر صوتی و اتوماسیون ریسک را در یک تجربه سه‌بعدی قرار دهید. هر ماژول فوراً با تم، جهت RTL و خط‌مشی انطباق شما هماهنگ می‌شود.',
+    primary: 'اجرای سندباکس',
+    secondary: 'مشاهده تور پلتفرم',
+    stats: [
+      { value: '۱۲۰میلیون+', label: 'رویداد API ماهانه' },
+      { value: '۴۵+', label: 'کشورهای پشتیبانی‌شده' },
+      { value: '۲۴/۷', label: 'عملیات و مانیتورینگ' },
+    ],
+  },
+};
+
+const ambientGlows = [
+  { top: '18%', left: '16%', size: 260, color: 'var(--brand-cyan)', delay: 0 },
+  { top: '68%', left: '72%', size: 300, color: 'var(--brand-indigo)', delay: 1 },
+  { top: '48%', left: '52%', size: 220, color: 'var(--brand-azure)', delay: 2 },
+];
+
+const floatingBiometricNodes = [
+  { id: 'node-1', top: '18%', left: '26%', size: 18, duration: 12, delay: 0, driftX: 14, driftY: 28, color: 'rgba(99, 102, 241, 0.85)' },
+  { id: 'node-2', top: '62%', left: '18%', size: 12, duration: 10, delay: 0.6, driftX: -10, driftY: 20, color: 'rgba(56, 189, 248, 0.75)' },
+  { id: 'node-3', top: '32%', left: '70%', size: 16, duration: 11, delay: 1.2, driftX: 10, driftY: 18, color: 'rgba(147, 197, 253, 0.8)' },
+  { id: 'node-4', top: '75%', left: '60%', size: 14, duration: 13, delay: 1.8, driftX: 16, driftY: 24, color: 'rgba(59, 130, 246, 0.75)' },
+  { id: 'node-5', top: '40%', left: '12%', size: 10, duration: 9, delay: 1.4, driftX: -12, driftY: 16, color: 'rgba(45, 212, 191, 0.7)' },
+  { id: 'node-6', top: '55%', left: '82%', size: 12, duration: 10.5, delay: 0.9, driftX: 8, driftY: 20, color: 'rgba(14, 165, 233, 0.8)' },
+  { id: 'node-7', top: '25%', left: '50%', size: 20, duration: 14, delay: 0.3, driftX: -8, driftY: 22, color: 'rgba(129, 140, 248, 0.85)' },
+];
 
 export function Hero3D() {
-  const { scrollY } = useScroll();
-  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
-  const rotate = useTransform(scrollY, [0, 500], [0, 45]);
-  
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  const { language, dir } = useLanguage();
+  const copy = hero3dCopy[language];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Background Gradient */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" dir={dir}>
       <div className="absolute inset-0 bg-[color:var(--bg-base)]">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[color:var(--brand-cyan)] rounded-full blur-[120px] animate-pulse-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[color:var(--brand-indigo)] rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-[color:var(--brand-azure)] rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+          {ambientGlows.map((glow) => (
+            <div
+              key={`${glow.top}-${glow.left}`}
+              className="absolute rounded-full blur-[120px] animate-pulse-slow"
+              style={{
+                top: glow.top,
+                left: glow.left,
+                width: glow.size,
+                height: glow.size,
+                background: glow.color,
+                animationDelay: `${glow.delay}s`,
+              }}
+            />
+          ))}
         </div>
       </div>
 
-      {/* 3D Grid Background */}
-      <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage: `
-          linear-gradient(to right, rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(59, 130, 246, 0.3) 1px, transparent 1px)
-        `,
-        backgroundSize: '60px 60px',
-        transform: 'perspective(1000px) rotateX(60deg)',
-        transformOrigin: 'center top'
-      }}></div>
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, rgba(59, 130, 246, 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(59, 130, 246, 0.3) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+          transform: 'perspective(1000px) rotateX(60deg)',
+          transformOrigin: 'center top',
+        }}
+      />
 
-      {/* 3D Floating Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Floating Card 1 */}
-        <motion.div
-          style={{ y: y1, rotateX: mousePosition.y, rotateY: mousePosition.x }}
-          className="absolute top-1/4 left-[10%] w-64 h-80 preserve-3d"
-        >
-          <div className="relative w-full h-full preserve-3d animate-float">
-            <div className="absolute inset-0 rounded-[var(--radius-lg)] bg-gradient-to-br from-[color:var(--brand-cyan)] to-[color:var(--brand-azure)] opacity-20 blur-xl"></div>
-            <div className="absolute inset-0 rounded-[var(--radius-lg)] bg-[color:var(--surface-elevated)] border border-[color:var(--brand-azure)] backdrop-blur-xl angular-cut" style={{
-              transform: 'translateZ(20px)',
-              boxShadow: '0 25px 50px -12px rgba(59, 130, 246, 0.5)'
-            }}>
-              <div className="p-6 h-full flex flex-col justify-between">
-                <div className="w-12 h-12 rounded-full bg-brand-gradient opacity-50"></div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-[color:var(--brand-azure)] opacity-30 rounded"></div>
-                  <div className="h-3 bg-[color:var(--brand-azure)] opacity-20 rounded w-3/4"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Floating Card 2 */}
-        <motion.div
-          style={{ y: y2, rotateX: mousePosition.y * -1, rotateY: mousePosition.x * -1 }}
-          className="absolute top-1/3 right-[10%] w-72 h-72 preserve-3d"
-        >
-          <div className="relative w-full h-full preserve-3d animate-float" style={{ animationDelay: '1s' }}>
-            <div className="absolute inset-0 rounded-[var(--radius-lg)] bg-gradient-to-br from-[color:var(--brand-indigo)] to-[color:var(--brand-teal)] opacity-20 blur-xl"></div>
-            <div className="absolute inset-0 rounded-[var(--radius-lg)] bg-[color:var(--surface-elevated)] border border-[color:var(--brand-indigo)] backdrop-blur-xl" style={{
-              transform: 'translateZ(30px) rotateY(-15deg)',
-              boxShadow: '0 25px 50px -12px rgba(99, 102, 241, 0.5)'
-            }}>
-              <div className="p-6 h-full flex items-center justify-center">
-                <div className="w-32 h-32 rounded-full bg-brand-gradient opacity-40 animate-ping-slow"></div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* 3D Cubes */}
-        {[...Array(5)].map((_, i) => (
+        {floatingBiometricNodes.map((node) => (
           <motion.div
-            key={i}
-            className="absolute preserve-3d"
-            style={{
-              top: `${20 + i * 15}%`,
-              left: `${10 + i * 20}%`,
-              width: '80px',
-              height: '80px'
-            }}
+            key={node.id}
+            className="absolute flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{
-              rotateX: [0, 360],
-              rotateY: [0, 360],
-              y: [0, -30, 0]
+              opacity: [0.15, 0.7, 0.4, 0.15],
+              scale: [1, 1.05, 1],
+              x: [0, node.driftX, 0],
+              y: [0, -node.driftY, 0],
             }}
-            transition={{
-              duration: 15 + i * 2,
-              repeat: Infinity,
-              ease: 'linear'
-            }}
+            transition={{ repeat: Infinity, duration: node.duration, delay: node.delay, ease: 'easeInOut' }}
+            style={{ top: node.top, left: node.left }}
           >
-            <div className="relative w-full h-full preserve-3d">
-              {/* Front */}
-              <div className="absolute inset-0 bg-brand-gradient opacity-10 border border-[color:var(--brand-azure)]" style={{ transform: 'translateZ(40px)' }}></div>
-              {/* Back */}
-              <div className="absolute inset-0 bg-brand-gradient opacity-10 border border-[color:var(--brand-indigo)]" style={{ transform: 'translateZ(-40px) rotateY(180deg)' }}></div>
-              {/* Right */}
-              <div className="absolute inset-0 bg-brand-gradient opacity-10 border border-[color:var(--brand-teal)]" style={{ transform: 'rotateY(90deg) translateZ(40px)' }}></div>
-              {/* Left */}
-              <div className="absolute inset-0 bg-brand-gradient opacity-10 border border-[color:var(--brand-cyan)]" style={{ transform: 'rotateY(-90deg) translateZ(40px)' }}></div>
-              {/* Top */}
-              <div className="absolute inset-0 bg-brand-gradient opacity-10 border border-[color:var(--brand-azure)]" style={{ transform: 'rotateX(90deg) translateZ(40px)' }}></div>
-              {/* Bottom */}
-              <div className="absolute inset-0 bg-brand-gradient opacity-10 border border-[color:var(--brand-indigo)]" style={{ transform: 'rotateX(-90deg) translateZ(40px)' }}></div>
+            <div className="relative" style={{ width: `${node.size}px`, height: `${node.size}px` }}>
+              <div
+                className="absolute -inset-3 rounded-full blur-2xl opacity-60"
+                style={{ background: node.color }}
+                aria-hidden="true"
+              />
+              <div
+                className="relative w-full h-full rounded-full border backdrop-blur-sm"
+                style={{
+                  borderColor: node.color,
+                  background: `radial-gradient(circle at 30% 30%, ${node.color} 0%, transparent 70%)`,
+                  boxShadow: `0 0 25px ${node.color}`,
+                }}
+              />
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -138,18 +141,18 @@ export function Hero3D() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[color:var(--surface-card)] border border-[color:var(--border-subtle)] mb-8 backdrop-blur-xl"
         >
           <Sparkles className="w-4 h-4 text-[color:var(--brand-azure)]" />
-          <span className="text-sm">سیستم احراز هویت هوشمند</span>
+          <span className="text-sm">{copy.badge}</span>
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl sm:text-5xl lg:text-7xl mb-6 leading-tight"
+          className="text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight"
         >
-          احراز هویت دیجیتال
+          {copy.title}
           <br />
-          <span className="text-brand-gradient">در عرض ثانیه‌ها</span>
+          <span className="text-brand-gradient">{copy.highlight}</span>
         </motion.h1>
 
         <motion.p
@@ -158,9 +161,7 @@ export function Hero3D() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-lg lg:text-xl text-[color:var(--text-secondary)] max-w-3xl mx-auto mb-10"
         >
-          با باربُد، تشخیص چهره، تست زنده‌بودن و OCR را در یک پلتفرم قدرتمند تجربه کنید.
-          <br />
-          امن، سریع و دقیق - آماده برای مقیاس‌پذیری نامحدود
+          {copy.description}
         </motion.p>
 
         <motion.div
@@ -170,51 +171,30 @@ export function Hero3D() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Button size="lg" className="group">
-            شروع رایگان
-            <ArrowLeft className="w-5 h-5 group-hover:translate-x-[-4px] transition-transform" />
+            {copy.primary}
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </Button>
           <Button variant="secondary" size="lg">
-            مشاهده دمو
+            {copy.secondary}
           </Button>
         </motion.div>
 
-        {/* Stats */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="grid grid-cols-3 gap-8 max-w-2xl mx-auto mt-16"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl mx-auto mt-16"
         >
-          {[
-            { value: '۹۹.۹٪', label: 'دقت' },
-            { value: '<۳۰s', label: 'سرعت' },
-            { value: '+۵۰۰', label: 'مشتری' }
-          ].map((stat, index) => (
-            <div key={index} className="preserve-3d group cursor-pointer">
+          {copy.stats.map((stat) => (
+            <div key={stat.label} className="preserve-3d group cursor-pointer">
               <div className="relative preserve-3d transition-transform duration-500 group-hover:scale-110 group-hover:[transform:rotateY(10deg)]">
-                <div className="text-2xl lg:text-3xl text-brand-gradient mb-1" dangerouslySetInnerHTML={{ __html: stat.value }}></div>
+                <div className="text-2xl lg:text-3xl text-brand-gradient mb-1">{stat.value}</div>
                 <div className="text-sm text-[color:var(--text-secondary)]">{stat.label}</div>
               </div>
             </div>
           ))}
         </motion.div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-6 h-10 rounded-full border-2 border-[color:var(--brand-azure)] flex items-start justify-center p-2"
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-[color:var(--brand-azure)]"></div>
-        </motion.div>
-      </motion.div>
     </section>
   );
 }
