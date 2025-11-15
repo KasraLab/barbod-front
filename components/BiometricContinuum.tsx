@@ -3,6 +3,8 @@
 import { Fragment } from 'react';
 import { motion } from 'framer-motion';
 import { Fingerprint, ScanFace, Mic2, ShieldCheck } from 'lucide-react';
+
+import { TextShimmer } from '@/components/ui/text-shimmer';
 import { useLanguage } from '@/lib/language-context';
 import type { Language } from '@/lib/translations';
 
@@ -20,12 +22,15 @@ type CopyShape = {
   title: string;
   highlight: string;
   description: string;
+  heroShimmer?: string[];
+  primaryCta?: string;
+  secondaryCta?: string;
   features: { key: FeatureKey; title: string; description: string }[];
   tickerLabel: string;
   signalLabel: string;
   signalHint: string;
   signalValue: string;
-  stats: { label: string; value: string; delta: string }[];
+  stats: { label: string; value: string; delta?: string }[];
 };
 
 const copyMap: Record<Language, CopyShape> = {
@@ -34,7 +39,10 @@ const copyMap: Record<Language, CopyShape> = {
     title: 'Biometric canvases',
     highlight: 'engineered like motion art',
     description:
-      'Barbod renders biometric trust as kinetic gradients and holographic rails where every document, face, and voice signal leaves a living trace.',
+      'Drop face recognition, document capture, voice biometrics, and risk automation into a single 3D-hybrid flow where each module instantly respects your theme, direction, and compliance guardrails.',
+    heroShimmer: ['Build an immersive flow', 'For biometric journeys'],
+    primaryCta: 'Launch sandbox',
+    secondaryCta: 'View platform tour',
     features: [
       {
         key: 'liveness',
@@ -62,9 +70,9 @@ const copyMap: Record<Language, CopyShape> = {
     signalHint: 'real-time biometric thread health',
     signalValue: '99.982%',
     stats: [
-      { label: 'Doc -> Face handshake', value: '312 ms', delta: '-28% latency' },
-      { label: 'Voice drift window', value: '18 ms', delta: '-6 ms vs baseline' },
-      { label: 'Spoof detection', value: '99.45%', delta: '+0.4% accuracy' },
+      { label: 'Monthly API events', value: '120M+', delta: 'biometric traffic observed' },
+      { label: 'Supported countries', value: '45+', delta: 'localized trust coverage' },
+      { label: 'Ops & monitoring', value: '24/7', delta: 'follow-the-sun responders' },
     ],
   },
   fa: {
@@ -72,7 +80,10 @@ const copyMap: Record<Language, CopyShape> = {
     title: 'بوم‌های بیومتریک',
     highlight: 'با تکنیک موشن آرت',
     description:
-      'باربد اعتماد بیومتریک را با گرادیان‌های زنده و ریل‌های هولوگرافیک نمایش می‌دهد؛ هر سیگنال سند، چهره و صدا ردپای فعال خود را دارد.',
+      'تشخیص چهره، ثبت اسناد، اثر صوتی و اتوماسیون ریسک را در یک تجربه سه‌بعدی قرار دهید؛ هر ماژول فوراً با تم، جهت RTL و خط‌مشی انطباق شما هماهنگ می‌شود.',
+    heroShimmer: ['تجربه‌ای غوطه‌ور بسازید', 'برای سفرهای بیومتریک'],
+    primaryCta: 'اجرای سندباکس',
+    secondaryCta: 'مشاهده تور پلتفرم',
     features: [
       {
         key: 'liveness',
@@ -100,9 +111,9 @@ const copyMap: Record<Language, CopyShape> = {
     signalHint: 'پایش لحظه‌ای رشته بیومتریک',
     signalValue: '۹۹.۹۸۲٪',
     stats: [
-      { label: 'دست دادن سند به چهره', value: '۳۱۲ میلی‌ثانیه', delta: '۲۸٪ کاهش تأخیر' },
-      { label: 'پنجره رانش صدا', value: '۱۸ میلی‌ثانیه', delta: '۶ میلی‌ثانیه سریع‌تر' },
-      { label: 'تشخیص جعل', value: '۹۹.۴۵٪', delta: '۰.۴٪ دقت بیشتر' },
+      { label: 'رویداد API ماهانه', value: '۱۲۰میلیون+', delta: 'پوشش سفرهای حساس' },
+      { label: 'کشورهای پشتیبانی‌شده', value: '۴۵+', delta: 'پروفایل‌سازی بومی' },
+      { label: 'عملیات و مانیتورینگ', value: '۲۴/۷', delta: 'پاسخ‌گویی آنی' },
     ],
   },
 };
@@ -131,28 +142,78 @@ const signalPulses = [
   { id: 'pulse-3', top: '40%', left: '72%', delay: 1.2 },
 ];
 
+const pixelFragments = [
+  { id: 'px-1', top: '6%', left: '10%', size: '14px', float: 10, duration: 12, delay: 0 },
+  { id: 'px-2', top: '20%', left: '32%', size: '10px', float: 6, duration: 14, delay: 0.3 },
+  { id: 'px-3', top: '18%', left: '62%', size: '12px', float: 8, duration: 13, delay: 0.6 },
+  { id: 'px-4', top: '38%', left: '8%', size: '9px', float: 7, duration: 11, delay: 0.2 },
+  { id: 'px-5', top: '46%', left: '50%', size: '11px', float: 9, duration: 13, delay: 0.85 },
+  { id: 'px-6', top: '66%', left: '24%', size: '8px', float: 5, duration: 12, delay: 0.95 },
+  { id: 'px-7', top: '70%', left: '72%', size: '10px', float: 6, duration: 11, delay: 0.45 },
+  { id: 'px-8', top: '82%', left: '36%', size: '9px', float: 7, duration: 14, delay: 0.55 },
+  { id: 'px-9', top: '30%', left: '82%', size: '12px', float: 6, duration: 12, delay: 1.1 },
+  { id: 'px-10', top: '56%', left: '88%', size: '8px', float: 7, duration: 10, delay: 0.7 },
+  { id: 'px-11', top: '12%', left: '44%', size: '7px', float: 5, duration: 9, delay: 0.15 },
+  { id: 'px-12', top: '78%', left: '58%', size: '9px', float: 6, duration: 12, delay: 1.25 },
+];
+
+const scanColumns = [
+  { id: 'scan-1', left: '6%', top: '-20%', height: '150%', duration: 22, delay: 0 },
+  { id: 'scan-2', left: '24%', top: '-25%', height: '160%', duration: 18, delay: 0.4 },
+  { id: 'scan-3', left: '52%', top: '-18%', height: '150%', duration: 20, delay: 0.7 },
+  { id: 'scan-4', left: '74%', top: '-22%', height: '155%', duration: 19, delay: 0.2 },
+  { id: 'scan-5', left: '90%', top: '-24%', height: '160%', duration: 21, delay: 0.95 },
+];
+
+const heroRasterLines = [
+  { id: 'raster-1', top: '6%', width: '70%', duration: 14, delay: 0 },
+  { id: 'raster-2', top: '26%', width: '80%', duration: 18, delay: 0.45 },
+  { id: 'raster-3', top: '47%', width: '85%', duration: 16, delay: 0.75 },
+  { id: 'raster-4', top: '68%', width: '60%', duration: 20, delay: 0.2 },
+];
+
+const heroAccentPixels = [
+  { id: 'hp-1', top: '14%', left: '5%', size: 12, duration: 10, delay: 0 },
+  { id: 'hp-2', top: '8%', left: '56%', size: 10, duration: 11, delay: 0.4 },
+  { id: 'hp-3', top: '34%', left: '18%', size: 9, duration: 9, delay: 0.65 },
+  { id: 'hp-4', top: '52%', left: '64%', size: 11, duration: 12, delay: 0.25 },
+  { id: 'hp-5', top: '70%', left: '30%', size: 8, duration: 13, delay: 0.55 },
+  { id: 'hp-6', top: '80%', left: '58%', size: 10, duration: 11, delay: 0.85 },
+];
+
 export function BiometricContinuum() {
   const { language, dir } = useLanguage();
   const copy = copyMap[language] ?? copyMap.en;
 
   return (
     <section className="relative py-24 sm:py-32 overflow-hidden">
-      <div className="absolute inset-0 opacity-60">
-        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(9,13,24,0)] via-[rgba(9,13,24,0.65)] to-[rgba(9,13,24,0.95)]" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 20% 20%, rgba(14,165,233,0.15) 0%, transparent 40%)' }} />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 80% 0%, rgba(59,130,246,0.15) 0%, transparent 35%)' }} />
-        <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(105deg, rgba(14,165,233,0.15) 0%, transparent 45%, rgba(99,102,241,0.1) 65%, transparent 100%)' }} />
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
-        <motion.div
-          className="absolute -top-32 -right-24 w-[420px] h-[420px] rounded-full blur-[120px] bg-[radial-gradient(circle,_rgba(14,165,233,0.65),_transparent_60%)]"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 48, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -left-24 w-[420px] h-[420px] rounded-full blur-[130px] bg-[radial-gradient(circle,_rgba(56,189,248,0.4),_transparent_70%)]"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 56, repeat: Infinity, ease: 'linear' }}
-        />
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[#020617]" />
+        <div className="absolute inset-0 opacity-80" style={{ backgroundImage: 'radial-gradient(circle at 30% 8%, rgba(14,165,233,0.22), transparent 55%)' }} />
+        <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'radial-gradient(circle at 78% 5%, rgba(99,102,241,0.18), transparent 45%)' }} />
+        <div className="absolute inset-0 opacity-35" style={{ backgroundImage: 'linear-gradient(115deg, rgba(14,165,233,0.12) 0%, transparent 40%, rgba(99,102,241,0.12) 70%, transparent 100%)' }} />
+        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0 opacity-10 mix-blend-screen" style={{ backgroundImage: 'linear-gradient(135deg, rgba(59,130,246,0.12) 25%, transparent 25%, transparent 50%, rgba(14,165,233,0.12) 50%, rgba(14,165,233,0.12) 75%, transparent 75%, transparent)', backgroundSize: '120px 120px' }} />
+
+        {scanColumns.map((column) => (
+          <motion.span
+            key={column.id}
+            className="absolute w-px sm:w-0.5 bg-gradient-to-b from-transparent via-cyan-200/70 to-transparent blur-[0.5px]"
+            style={{ left: column.left, top: column.top, height: column.height }}
+            animate={{ y: ['-12%', '12%', '-12%'] }}
+            transition={{ duration: column.duration, repeat: Infinity, ease: 'easeInOut', delay: column.delay }}
+          />
+        ))}
+
+        {pixelFragments.map((fragment) => (
+          <motion.span
+            key={fragment.id}
+            className="absolute rounded-sm bg-gradient-to-br from-[rgba(34,211,238,0.9)] via-[rgba(14,165,233,0.85)] to-transparent shadow-[0_0_30px_rgba(14,165,233,0.65)]"
+            style={{ width: fragment.size, height: fragment.size, top: fragment.top, left: fragment.left }}
+            animate={{ opacity: [0.2, 1, 0.2], y: [0, -fragment.float, 0] }}
+            transition={{ duration: fragment.duration, repeat: Infinity, ease: 'easeInOut', delay: fragment.delay }}
+          />
+        ))}
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12" dir={dir}>
@@ -170,13 +231,79 @@ export function BiometricContinuum() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.65, delay: 0.1 }}>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight mb-4">
-                {copy.title}{' '}
-                <span className="text-brand-gradient">
-                  {copy.highlight}
-                </span>
-              </h2>
-              <p className="text-lg text-[color:var(--text-secondary)]">{copy.description}</p>
+              <div className="relative pb-2">
+                <div className="absolute pointer-events-none select-none" aria-hidden="true" style={{ left: '-48px', right: '-48px', top: '-72px', height: '320px' }}>
+                  <div className="absolute inset-0 blur-[120px] opacity-60 bg-gradient-to-r from-cyan-500/10 via-transparent to-indigo-500/10" />
+                  {heroRasterLines.map((line) => (
+                    <motion.span
+                      key={line.id}
+                      className="absolute left-0 h-px bg-gradient-to-r from-transparent via-cyan-200 to-transparent"
+                      style={{ top: line.top, width: line.width }}
+                      animate={{ opacity: [0.1, 0.8, 0.1], scaleX: [0.8, 1, 0.8] }}
+                      transition={{ duration: line.duration, repeat: Infinity, ease: 'easeInOut', delay: line.delay }}
+                    />
+                  ))}
+                  {heroAccentPixels.map((pixel) => (
+                    <motion.span
+                      key={pixel.id}
+                      className="absolute rounded-sm bg-gradient-to-br from-cyan-300 via-white/80 to-transparent shadow-[0_0_20px_rgba(59,130,246,0.45)]"
+                      style={{ top: pixel.top, left: pixel.left, width: `${pixel.size}px`, height: `${pixel.size}px` }}
+                      animate={{ opacity: [0.2, 0.9, 0.2], y: [0, -8, 0] }}
+                      transition={{ duration: pixel.duration, repeat: Infinity, ease: 'easeInOut', delay: pixel.delay }}
+                    />
+                  ))}
+                </div>
+                {copy.heroShimmer?.length ? (
+                  <div className="space-y-2 mb-4">
+                    {copy.heroShimmer.map((line, index) => (
+                      <TextShimmer
+                        key={`${line}-${index}`}
+                        as="h2"
+                        duration={1.35 + index * 0.2}
+                        spread={1.6}
+                        className="block text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight [--base-color:rgba(248,250,252,0.88)] [--base-gradient-color:#0ea5e9] dark:[--base-color:rgba(248,250,252,0.97)] dark:[--base-gradient-color:#6366f1]"
+                      >
+                        {line}
+                      </TextShimmer>
+                    ))}
+                  </div>
+                ) : (
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight mb-4">
+                    {copy.title}{' '}
+                    <span className="text-brand-gradient">
+                      {copy.highlight}
+                    </span>
+                  </h2>
+                )}
+                <p className="text-lg text-[color:var(--text-secondary)]">{copy.description}</p>
+                {(copy.primaryCta || copy.secondaryCta) && (
+                  <div className="flex flex-wrap items-center gap-3 pt-4">
+                    {copy.primaryCta && (
+                      <button
+                        type="button"
+                        className="relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[color:var(--brand-cyan)] to-[color:var(--brand-indigo)] px-6 py-2.5 text-sm font-medium text-white shadow-[0_10px_40px_rgba(14,165,233,0.35)] overflow-hidden group"
+                      >
+                        <motion.span
+                          aria-hidden="true"
+                          className="absolute inset-0 bg-[radial-gradient(circle,_rgba(255,255,255,0.45),_transparent_60%)] opacity-0 group-hover:opacity-60"
+                          animate={{ scale: [0.8, 1.3, 0.8] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+                        <span className="relative">{copy.primaryCta}</span>
+                      </button>
+                    )}
+                    {copy.secondaryCta && (
+                      <button
+                        type="button"
+                        className="relative inline-flex items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)]/80 px-6 py-2.5 text-sm font-medium text-[color:var(--text-secondary)] overflow-hidden"
+                      >
+                        <span className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-60" aria-hidden="true" />
+                        <span className="relative">{copy.secondaryCta}</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </motion.div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -310,7 +437,7 @@ export function BiometricContinuum() {
                   <div key={stat.label} className="rounded-[var(--radius-lg)] border border-[color:var(--border-hairline)] bg-[color:var(--surface-card)]/60 p-4">
                     <p className="text-sm text-[color:var(--text-secondary)]">{stat.label}</p>
                     <p className="text-2xl font-semibold mt-2">{stat.value}</p>
-                    <p className="text-xs text-emerald-400 mt-1">{stat.delta}</p>
+                    {stat.delta && <p className="text-xs text-emerald-400 mt-1">{stat.delta}</p>}
                   </div>
                 ))}
               </div>
