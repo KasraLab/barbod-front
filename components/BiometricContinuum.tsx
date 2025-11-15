@@ -142,29 +142,6 @@ const signalPulses = [
   { id: 'pulse-3', top: '40%', left: '72%', delay: 1.2 },
 ];
 
-const pixelFragments = [
-  { id: 'px-1', top: '6%', left: '10%', size: '14px', float: 10, duration: 12, delay: 0 },
-  { id: 'px-2', top: '20%', left: '32%', size: '10px', float: 6, duration: 14, delay: 0.3 },
-  { id: 'px-3', top: '18%', left: '62%', size: '12px', float: 8, duration: 13, delay: 0.6 },
-  { id: 'px-4', top: '38%', left: '8%', size: '9px', float: 7, duration: 11, delay: 0.2 },
-  { id: 'px-5', top: '46%', left: '50%', size: '11px', float: 9, duration: 13, delay: 0.85 },
-  { id: 'px-6', top: '66%', left: '24%', size: '8px', float: 5, duration: 12, delay: 0.95 },
-  { id: 'px-7', top: '70%', left: '72%', size: '10px', float: 6, duration: 11, delay: 0.45 },
-  { id: 'px-8', top: '82%', left: '36%', size: '9px', float: 7, duration: 14, delay: 0.55 },
-  { id: 'px-9', top: '30%', left: '82%', size: '12px', float: 6, duration: 12, delay: 1.1 },
-  { id: 'px-10', top: '56%', left: '88%', size: '8px', float: 7, duration: 10, delay: 0.7 },
-  { id: 'px-11', top: '12%', left: '44%', size: '7px', float: 5, duration: 9, delay: 0.15 },
-  { id: 'px-12', top: '78%', left: '58%', size: '9px', float: 6, duration: 12, delay: 1.25 },
-];
-
-const scanColumns = [
-  { id: 'scan-1', left: '6%', top: '-20%', height: '150%', duration: 22, delay: 0 },
-  { id: 'scan-2', left: '24%', top: '-25%', height: '160%', duration: 18, delay: 0.4 },
-  { id: 'scan-3', left: '52%', top: '-18%', height: '150%', duration: 20, delay: 0.7 },
-  { id: 'scan-4', left: '74%', top: '-22%', height: '155%', duration: 19, delay: 0.2 },
-  { id: 'scan-5', left: '90%', top: '-24%', height: '160%', duration: 21, delay: 0.95 },
-];
-
 const heroRasterLines = [
   { id: 'raster-1', top: '6%', width: '70%', duration: 14, delay: 0 },
   { id: 'raster-2', top: '26%', width: '80%', duration: 18, delay: 0.45 },
@@ -187,34 +164,16 @@ export function BiometricContinuum() {
 
   return (
     <section className="relative py-24 sm:py-32 overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[#020617]" />
-        <div className="absolute inset-0 opacity-80" style={{ backgroundImage: 'radial-gradient(circle at 30% 8%, rgba(14,165,233,0.22), transparent 55%)' }} />
-        <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'radial-gradient(circle at 78% 5%, rgba(99,102,241,0.18), transparent 45%)' }} />
-        <div className="absolute inset-0 opacity-35" style={{ backgroundImage: 'linear-gradient(115deg, rgba(14,165,233,0.12) 0%, transparent 40%, rgba(99,102,241,0.12) 70%, transparent 100%)' }} />
-        <div className="absolute inset-0 opacity-15" style={{ backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.04) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="absolute inset-0 opacity-10 mix-blend-screen" style={{ backgroundImage: 'linear-gradient(135deg, rgba(59,130,246,0.12) 25%, transparent 25%, transparent 50%, rgba(14,165,233,0.12) 50%, rgba(14,165,233,0.12) 75%, transparent 75%, transparent)', backgroundSize: '120px 120px' }} />
-
-        {scanColumns.map((column) => (
-          <motion.span
-            key={column.id}
-            className="absolute w-px sm:w-0.5 bg-gradient-to-b from-transparent via-cyan-200/70 to-transparent blur-[0.5px]"
-            style={{ left: column.left, top: column.top, height: column.height }}
-            animate={{ y: ['-12%', '12%', '-12%'] }}
-            transition={{ duration: column.duration, repeat: Infinity, ease: 'easeInOut', delay: column.delay }}
-          />
-        ))}
-
-        {pixelFragments.map((fragment) => (
-          <motion.span
-            key={fragment.id}
-            className="absolute rounded-sm bg-gradient-to-br from-[rgba(34,211,238,0.9)] via-[rgba(14,165,233,0.85)] to-transparent shadow-[0_0_30px_rgba(14,165,233,0.65)]"
-            style={{ width: fragment.size, height: fragment.size, top: fragment.top, left: fragment.left }}
-            animate={{ opacity: [0.2, 1, 0.2], y: [0, -fragment.float, 0] }}
-            transition={{ duration: fragment.duration, repeat: Infinity, ease: 'easeInOut', delay: fragment.delay }}
-          />
-        ))}
-      </div>
+      <div className="absolute inset-0 bg-[color:var(--bg-base)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[color:var(--surface-card)]/60 to-[color:var(--bg-base)]" />
+      <div
+        className="absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            'linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(0deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+          backgroundSize: '54px 54px',
+        }}
+      />
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12" dir={dir}>
         <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] items-stretch">

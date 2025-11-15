@@ -2,7 +2,6 @@
 
 import { Navbar } from '@/components/Navbar';
 import { Hero3D } from '@/components/Hero3D';
-import { ParticleBackground } from '@/components/ParticleBackground';
 import { TrustSection } from '@/components/TrustSection';
 import { Features3D } from '@/components/Features3D';
 import { ComparisonSection } from '@/components/ComparisonSection';
@@ -27,7 +26,6 @@ export default function Home() {
       <Navbar onNavigate={handleNavigate} />
       <main className="relative">
         <div className="relative">
-          <ParticleBackground />
           <Hero3D />
         </div>
         <BiometricContinuum />

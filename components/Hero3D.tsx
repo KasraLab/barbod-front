@@ -173,7 +173,7 @@ const heroBiometricIcons = [
   },
   {
     id: 'icon-4',
-    top: '68%',
+    top: '32%',
     left: '70%',
     icon: ShieldCheck,
     delay: 0.4,
@@ -243,7 +243,7 @@ export function Hero3D() {
           />
         </>
       )}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none" style={{ direction: 'ltr' }}>
         {heroBiometricNodes.map((node) => (
           <motion.div
             key={node.id}
@@ -265,7 +265,7 @@ export function Hero3D() {
           />
         ))}
       </div>
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none" style={{ direction: 'ltr' }}>
         {heroBiometricIcons.map((item) => {
           const Icon = item.icon;
           return (
@@ -275,29 +275,29 @@ export function Hero3D() {
               style={{
                 top: item.top,
                 left: item.left,
-                width: isLight ? '72px' : '84px',
-                height: isLight ? '72px' : '84px',
+                width: isLight ? '74px' : '86px',
+                height: isLight ? '74px' : '86px',
                 background: isLight ? item.surfaceLight : item.surfaceDark,
                 borderColor: isLight ? 'rgba(148,163,184,0.45)' : 'rgba(255,255,255,0.2)',
                 color: isLight ? item.iconLight : item.iconDark,
                 mixBlendMode: isLight ? 'normal' : 'screen',
-                boxShadow: `${isLight ? '0 22px 45px rgba(15,23,42,0.25)' : '0 25px 60px rgba(3,7,18,0.7)'}, 0 0 60px ${item.glow}`,
-                backdropFilter: 'blur(18px)',
+                boxShadow: `${isLight ? '0 24px 48px rgba(15,23,42,0.3)' : '0 28px 65px rgba(3,7,18,0.75)'}, 0 0 60px ${item.glow}`,
+                backdropFilter: 'blur(20px)',
               }}
               animate={{
-                rotate: item.clockwise ? [0, 12, -10, 0] : [0, -12, 10, 0],
+                rotate: item.clockwise ? [0, 14, -12, 0] : [0, -14, 12, 0],
                 opacity: isLight ? [0.7, 0.98, 0.8, 0.7] : [0.65, 0.95, 0.75, 0.65],
-                y: item.clockwise ? [0, -18, 10, 0] : [0, -12, 14, 0],
-                x: item.clockwise ? [0, 10, -8, 0] : [0, -10, 8, 0],
+                y: item.clockwise ? [0, -22, 12, 0] : [0, -16, 18, 0],
+                x: item.clockwise ? [0, 12, -10, 0] : [0, -12, 10, 0],
               }}
               transition={{ duration: 18, delay: item.delay, repeat: Infinity, ease: 'easeInOut' }}
             >
               <span
                 aria-hidden="true"
-                className="absolute inset-[-18px] rounded-3xl opacity-65"
-                style={{ background: `radial-gradient(circle, ${item.glow}, transparent 72%)`, filter: 'blur(22px)' }}
+                className="absolute inset-[-20px] rounded-3xl opacity-70"
+                style={{ background: `radial-gradient(circle, ${item.glow}, transparent 72%)`, filter: 'blur(24px)' }}
               />
-              <Icon className="relative w-8 h-8" style={{ strokeWidth: 1.3 }} />
+              <Icon className="relative w-8 h-8" style={{ strokeWidth: 1.25 }} />
             </motion.span>
           );
         })}
@@ -394,3 +394,4 @@ export function Hero3D() {
     </section>
   );
 }
+
