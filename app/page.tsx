@@ -13,6 +13,8 @@ import { Pricing3D } from '@/components/Pricing3D';
 import { FAQSection } from '@/components/FAQSection';
 import { CTA3D } from '@/components/CTA3D';
 import { Footer } from '@/components/Footer';
+import { BiometricContinuum } from '@/components/BiometricContinuum';
+import { GsapBiometricShowcase } from '@/components/GsapBiometricShowcase';
 
 export default function Home() {
   const handleNavigate = (section: string) => {
@@ -28,6 +30,8 @@ export default function Home() {
           <ParticleBackground />
           <Hero3D />
         </div>
+        <BiometricContinuum />
+        <GsapBiometricShowcase />
         <TrustSection />
         <Features3D />
         <ComparisonSection />
